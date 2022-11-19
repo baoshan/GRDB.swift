@@ -10,6 +10,8 @@ var swiftSettings: [SwiftSetting] = []
 var cSettings: [CSetting] = []
 if ProcessInfo.processInfo.environment["SQLITE_ENABLE_FTS5"] == "1" {
     swiftSettings.append(.define("SQLITE_ENABLE_FTS5"))
+} else {
+    swiftSettings.append(.define("SQLITE_ENABLE_FTS5"))
 }
 if ProcessInfo.processInfo.environment["SQLITE_ENABLE_PREUPDATE_HOOK"] == "1" {
     swiftSettings.append(.define("SQLITE_ENABLE_PREUPDATE_HOOK"))

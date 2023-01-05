@@ -7,6 +7,9 @@ GRDB adheres to [Semantic Versioning](https://semver.org/), with one exception: 
 
 #### 6.x Releases
 
+- `6.6.x` Releases - [6.6.0](#660)
+- `6.5.x` Releases - [6.5.0](#650)
+- `6.4.x` Releases - [6.4.0](#640)
 - `6.3.x` Releases - [6.3.0](#630) - [6.3.1](#631)
 - `6.2.x` Releases - [6.2.0](#620)
 - `6.1.x` Releases - [6.1.0](#610)
@@ -100,6 +103,34 @@ GRDB adheres to [Semantic Versioning](https://semver.org/), with one exception: 
 - [0.110.0](#01100), ...
 
 ---
+
+## 6.6.0
+
+Released December 29, 2022 &bull; [diff](https://github.com/groue/GRDB.swift/compare/v6.5.0...v6.6.0)
+
+- **New**: [#1304](https://github.com/groue/GRDB.swift/pull/1304) by [@groue](https://github.com/groue): Expose generated columns with availability checks
+
+## 6.5.0
+
+Released December 5, 2022 &bull; [diff](https://github.com/groue/GRDB.swift/compare/v6.4.0...v6.5.0)
+
+- **New**: [#1299](https://github.com/groue/GRDB.swift/pull/1299) by [@groue](https://github.com/groue): Record.find() convenience methods
+
+## 6.4.0
+
+Released November 28, 2022 &bull; [diff](https://github.com/groue/GRDB.swift/compare/v6.3.1...v6.4.0)
+
+- **New**: [#1293](https://github.com/groue/GRDB.swift/pull/1293) by [@groue](https://github.com/groue): Enable concurrent reads from a WAL snapshot.
+- **New**: [#1297](https://github.com/groue/GRDB.swift/pull/1297) by [@groue](https://github.com/groue): SPM: expose the CSQLite product.
+- **New**: `DatabaseReader.configuration.readQoS` and `writeQoS` return the effective quality of service of read-only and write database accesses. This helps application code avoid priority inversion and similar scheduling misuses when needed.
+- **New**: `DatabaseReader.configuration.maximumReaderCount` returns the effective capacity for concurrent reads, so that application code can adapt when needed.
+- **New**: `DatabasePool.makeSnapshot()` no longer throws an error when the database is not in the WAL mode. In such case, the returned snapshot prevents all database modifications during its lifetime.
+- **New**: A new [`DatabaseSnapshotReader`](https://swiftpackageindex.com/groue/grdb.swift/documentation/grdb/databasesnapshotreader) protocol was introduced for types that see an unchanging database content (`DatabaseSnapshot` and the new `DatabaseSnapshotPool`).   
+- **New**: [`Database.registerAccess(to:)`](https://swiftpackageindex.com/groue/grdb.swift/documentation/grdb/database/registeraccess(to:)) has `ValueObservation` track a region. This helps building optimized observations of a constant database region with [`ValueObservation.trackingConstantRegion(_:)`](https://swiftpackageindex.com/groue/grdb.swift/documentation/grdb/valueobservation/trackingconstantregion(_:)).
+- **New**: Open several connections to the same in-memory database with [`DatabaseQueue(named:)`](https://swiftpackageindex.com/groue/grdb.swift/documentation/grdb/databasequeue/init(named:configuration:)).
+- **New**: [`TableDefinition`](https://swiftpackageindex.com/groue/grdb.swift/documentation/grdb/tabledefinition) has new methods for defining primary keys, with automatic NOT NULL constraints. They workaround [an SQLite bug](https://www.sqlite.org/quirks.html#primary_keys_can_sometimes_contain_nulls). Previous techniques for defining primary keys are preserved for backwards compatibility, but their use is not recommended.
+- **New**: The [Database Schema](https://swiftpackageindex.com/groue/grdb.swift/documentation/grdb/databaseschema) documentation article has a brand new "Database Schema Recommendations" section.
+- **New**: Multiple improvements to the DocC documentation.
 
 ## 6.3.1
 

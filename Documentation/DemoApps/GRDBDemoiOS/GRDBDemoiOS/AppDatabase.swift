@@ -16,7 +16,7 @@ final class AppDatabase {
     /// Application can use a `DatabasePool`, and tests can use a fast
     /// in-memory `DatabaseQueue`.
     ///
-    /// See <https://github.com/groue/GRDB.swift/blob/master/README.md#database-connections>
+    /// See <https://swiftpackageindex.com/groue/grdb.swift/documentation/grdb/databaseconnections>
     private let dbWriter: any DatabaseWriter
     
     /// The DatabaseMigrator that defines the database schema.
@@ -33,7 +33,7 @@ final class AppDatabase {
         
         migrator.registerMigration("createPlayer") { db in
             // Create a table
-            // See https://github.com/groue/GRDB.swift#create-tables
+            // See <https://swiftpackageindex.com/groue/grdb.swift/documentation/grdb/databaseschema>
             try db.create(table: "player") { t in
                 t.autoIncrementedPrimaryKey("id")
                 t.column("name", .text).notNull()
@@ -127,7 +127,7 @@ extension AppDatabase {
 // reading methods.
 extension AppDatabase {
     /// Provides a read-only access to the database
-    var databaseReader: DatabaseReader {
+    var reader: DatabaseReader {
         dbWriter
     }
 }

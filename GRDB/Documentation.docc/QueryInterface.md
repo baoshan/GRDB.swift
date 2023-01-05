@@ -1,6 +1,6 @@
-# Record Types and the Query Interface
+# Records and the Query Interface
 
-Record types and the query interface build SQL queries for you
+Record types and the query interface build SQL queries for you.
 
 ## Topics
 
@@ -22,6 +22,11 @@ Record types and the query interface build SQL queries for you
 - ``CommonTableExpression``
 - ``QueryInterfaceRequest``
 - ``Table``
+
+### Errors
+
+- ``RecordError``
+- ``PersistenceError``
 
 ### Supporting Types
 

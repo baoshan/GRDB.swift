@@ -4,51 +4,6 @@ import Foundation
 import UIKit
 #endif
 
-/// A database connection that serializes accesses to an SQLite database.
-///
-/// ## Overview
-///
-/// A `DatabaseQueue` creates one single SQLite connection. All database
-/// accesses are executed in a serial **writer dispatch queue**. The SQLite
-/// connection is closed when the `DatabaseQueue` is deallocated.
-///
-/// ```swift
-/// let dbQueue = try DatabaseQueue(path: "/path/to/database.sqlite")
-///
-/// let playerCount = try dbQueue.read { db in
-///     try Player.fetchCount(db)
-/// }
-///
-/// let newPlayerCount = try dbQueue.write { db -> Int in
-///     try Player(name: "Arthur").insert(db)
-///     return try Player.fetchCount(db)
-/// }
-/// ```
-///
-/// ## Usage
-///
-/// `DatabaseQueue` inherits most of its database access methods from the
-/// ``DatabaseReader`` and ``DatabaseWriter`` protocols. It defines a few
-/// specific database access methods as well.
-/// 
-/// ## Topics
-/// 
-/// ### Creating a DatabaseQueue
-///
-/// - ``init(configuration:)``
-/// - ``init(path:configuration:)``
-///
-/// ### Accessing the Database
-///
-/// See ``DatabaseReader`` and ``DatabaseWriter`` for more database
-/// access methods.
-///
-/// - ``inDatabase(_:)``
-/// - ``inTransaction(_:_:)``
-///
-/// ### Managing the SQLite Connection
-///
-/// - ``releaseMemory()``
 public final class DatabaseQueue {
     private let writer: SerializedDatabase
     
@@ -83,6 +38,10 @@ public final class DatabaseQueue {
     ///     - configuration: A configuration.
     /// - throws: A ``DatabaseError`` whenever an SQLite error occurs.
     public init(path: String, configuration: Configuration = Configuration()) throws {
+        // DatabaseQueue can't perform parallel reads
+        var configuration = configuration
+        configuration.maximumReaderCount = 1
+        
         writer = try SerializedDatabase(
             path: path,
             configuration: configuration,
@@ -101,13 +60,41 @@ public final class DatabaseQueue {
     
     /// Opens an in-memory SQLite database.
     ///
-    /// The database memory is released when the database queue
-    /// gets deallocated.
+    /// To create an independent in-memory database, don't pass any name. The
+    /// database memory is released when the database queue is deallocated:
     ///
+    /// ```swift
+    /// // An independent in-memory database
+    /// let dbQueue = try DatabaseQueue()
+    /// ```
+    ///
+    /// When you need to open several connections to the same in-memory
+    /// database, give it a name:
+    ///
+    /// ```swift
+    /// // A shared in-memory database
+    /// let dbQueue = try DatabaseQueue(named: "myDatabase")
+    /// ```
+    ///
+    /// In this case, the database is automatically deleted and memory is
+    /// reclaimed when the last connection to the database of the given
+    /// name closes.
+    ///
+    /// Related SQLite documentation: <https://www.sqlite.org/inmemorydb.html>
+    ///
+    /// - parameter name: When nil, an independent in-memory database opens.
+    ///   Otherwise, the shared in-memory database of the given name opens.
     /// - parameter configuration: A configuration.
-    public init(configuration: Configuration = Configuration()) throws {
+    public init(named name: String? = nil, configuration: Configuration = Configuration()) throws {
+        let path: String
+        if let name {
+            path = "file:\(name)?mode=memory&cache=shared"
+        } else {
+            path = ":memory:"
+        }
+        
         writer = try SerializedDatabase(
-            path: ":memory:",
+            path: path,
             configuration: configuration,
             defaultLabel: "GRDB.DatabaseQueue")
     }
@@ -307,7 +294,7 @@ extension DatabaseQueue: DatabaseReader {
     
     public func _add<Reducer: ValueReducer>(
         observation: ValueObservation<Reducer>,
-        scheduling scheduler: ValueObservationScheduler,
+        scheduling scheduler: some ValueObservationScheduler,
         onChange: @escaping (Reducer.Value) -> Void)
     -> AnyDatabaseCancellable
     {
